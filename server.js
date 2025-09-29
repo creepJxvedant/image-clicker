@@ -12,7 +12,7 @@ fs.mkdirSync(photosDir, { recursive: true });
 console.log("Photos directory:", photosDir);
 
 // Passkey for hidden dashboard
-const DASHBOARD_PASSKEY = "yourSecretPasskey"; // <-- change this
+const DASHBOARD_PASSKEY = "9870"; // <-- change this
 
 // Helper to get next sequential photo number
 function getNextPhotoNumber() {
